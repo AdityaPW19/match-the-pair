@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Match the Pair - Kids Learning Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app-container">
+
+  <!-- Background Animated Doodles -->
+  <svg class="bg-doodles" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="120" r="18" stroke="#FFE2BD" stroke-width="3" stroke-dasharray="4 4" />
+    <path d="M330 90 L345 115 L320 120 Z" stroke="#FFD8B3" stroke-width="2.5" fill="none" />
+    <circle cx="340" cy="380" r="28" stroke="#E6EEF8" stroke-width="3" stroke-dasharray="6 4" />
+    <path d="M40 500 Q 65 480 90 500 T 140 500" stroke="#FFE6C7" stroke-width="3" fill="none" />
+    <polygon points="50,720 58,736 76,738 62,750 66,768 50,758 34,768 38,750 24,738 42,736" stroke="#FFE3A8" stroke-width="2" fill="none" />
+    <circle cx="340" cy="690" r="14" stroke="#DFF4E5" stroke-width="3" />
+    <path d="M300 240 Q 320 220 340 240" stroke="#E6EEF8" stroke-width="3" fill="none" />
+    <line x1="20" y1="300" x2="60" y2="340" stroke="#FFE6C7" stroke-width="2.5" stroke-linecap="round" />
+  </svg>
+
+  <!-- Landscape warning overlay -->
+  <div id="landscape-overlay">
+    <svg class="rotate-phone-icon" viewBox="0 0 100 100" fill="none">
+      <rect x="25" y="15" width="50" height="70" rx="8" stroke="#FF6B00" stroke-width="6" fill="#FFF"/>
+      <circle cx="50" cy="74" r="3" fill="#FF6B00"/>
+      <path d="M85 45 C 92 55, 85 70, 75 75" stroke="#FF6B00" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 4"/>
+      <polygon points="73,70 78,80 67,78" fill="#FF6B00"/>
+    </svg>
+    <div class="landscape-text">Please turn your phone<br>to Portrait mode! 📱</div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen active">
+    <div class="game-logo">
+      <div class="game-title-main">MATCH THE<br>PAIR!</div>
+      <div class="game-title-sub">Logic & Thinking</div>
+    </div>
+
+    <div class="intro-showcase">
+      <div class="intro-card" id="intro-shoe-box"></div>
+      <div class="intro-connector">↔</div>
+      <div class="intro-card card-two" id="intro-sock-box"></div>
+    </div>
+
+    <div class="intro-sparky-container" id="intro-sparky-box"></div>
+
+    <button id="btn-start-game" class="btn-play-big">
+      <span>PLAY</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5,3 19,12 5,21" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- MAIN GAME SCREEN -->
+  <div id="game-screen" class="screen">
+    <!-- Top HUD -->
+    <div class="top-hud">
+      <button id="btn-pause" class="hud-btn" aria-label="Pause">⏸</button>
+      
+      <div class="progress-hud">
+        <div class="level-label" id="hud-level-text">LEVEL 1</div>
+        <div class="dots-container" id="hud-dots"></div>
+      </div>
+
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <div class="xp-pill" id="hud-xp-box">
+          <span>⭐</span><span id="hud-xp-val">0</span>
+        </div>
+        <button id="btn-sound" class="hud-btn" aria-label="Sound Toggle">🔊</button>
+      </div>
+    </div>
+
+    <!-- Mascot Area -->
+    <div class="mascot-strip">
+      <div class="sparky-wrapper" id="game-sparky-box"></div>
+      <div class="sparky-speech" id="sparky-speech-bubble">Let's Match!</div>
+    </div>
+
+    <!-- Interactive Game Stage -->
+    <div class="stage-container" id="stage-area">
+      <!-- Dynamic SVG connection line canvas -->
+      <canvas id="connection-canvas"></canvas>
+
+      <!-- Left Column Cards -->
+      <div class="column-cards" id="left-cards-col"></div>
+
+      <!-- Right Column Cards -->
+      <div class="column-cards" id="right-cards-col"></div>
+
+      <!-- Floating Reward Banner -->
+      <div id="feedback-toast">Great! 🌟</div>
+
+      <!-- Interactive Tutorial Finger -->
+      <div id="tutorial-layer">
+        <div id="tutorial-hand">
+          <svg viewBox="0 0 64 64" fill="none">
+            <path d="M28 10 C28 6 34 6 34 10 L34 28 L36 28 C38 28 42 28 42 32 L42 36 C42 38 46 38 46 42 L46 46 C46 54 38 58 28 58 C18 58 14 52 14 44 L14 36 C14 32 18 30 22 34 L28 40 Z" fill="#FFE169" stroke="#E5A700" stroke-width="3" stroke-linejoin="round" />
+            <circle cx="31" cy="8" r="7" stroke="#FF6B00" stroke-width="2.5" fill="none" stroke-dasharray="3 3"/>
+          </svg>
+        </div>
+        <div class="tutorial-bubble">Match them! 👇</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE MODAL -->
+  <div id="pause-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title">Take a Break! ☕</div>
+      <div class="modal-subtitle">The game is safely paused</div>
+      <div class="modal-btn-list">
+        <button id="btn-resume" class="modal-btn btn-green">▶ Resume</button>
+        <button id="btn-restart" class="modal-btn btn-yellow">↺ Restart</button>
+        <button id="btn-home" class="modal-btn btn-blue">🏠 Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL COMPLETE MODAL -->
+  <div id="complete-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div style="width: 100px; height: 100px; margin: 0 auto 10px;" id="complete-sparky-box"></div>
+      <div class="modal-title">Great Job! 🎉</div>
+      <div class="modal-subtitle" id="complete-sub-text">Level 1 Complete</div>
+      <div class="modal-btn-list">
+        <button id="btn-next-level" class="modal-btn btn-green" style="font-size: 24px; height: 64px;">NEXT ▶</button>
+        <button id="btn-replay-level" class="modal-btn btn-yellow" style="height: 48px; font-size: 16px;">↺ Replay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
