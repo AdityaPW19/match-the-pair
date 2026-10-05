@@ -1,762 +1,398 @@
-/* ==========================================================================
-   MATCH THE PAIR - GAME ENGINE & LOGIC
-   Mobile-First Educational Logic Game for Kids
-   ========================================================================== */
+/**
+ * MATCH THE PAIR - MAIN CLIENT CONTROLLER
+ * Connects UI, Event Handlers, Sound, Mascot Sparky, and Level Progression.
+ */
 
-// 1. GAME DATA: 30 Educational Pairing Levels
-const LEVELS = [
-  // Levels 1-5: Very Easy & Familiar (3 pairs)
-  {
-    level: 1,
-    pairs: [
-      { id: "p1", left: "shoe", right: "sock", leftName: "Shoe", rightName: "Sock" },
-      { id: "p2", left: "toothbrush", right: "tooth", leftName: "Toothbrush", rightName: "Tooth" },
-      { id: "p3", left: "lock", right: "key", leftName: "Lock", rightName: "Key" }
-    ]
-  },
-  {
-    level: 2,
-    pairs: [
-      { id: "p1", left: "cup", right: "teapot", leftName: "Cup", rightName: "Teapot" },
-      { id: "p2", left: "pencil", right: "notebook", leftName: "Pencil", rightName: "Notebook" },
-      { id: "p3", left: "bed", right: "couch", leftName: "Bed", rightName: "Couch" }
-    ]
-  },
-  {
-    level: 3,
-    pairs: [
-      { id: "p1", left: "plate", right: "spoon", leftName: "Plate", rightName: "Spoon" },
-      { id: "p2", left: "soap", right: "bathtub", leftName: "Soap", rightName: "Bathtub" },
-      { id: "p3", left: "bulb", right: "flashlight", leftName: "Light Bulb", rightName: "Flashlight" }
-    ]
-  },
-  {
-    level: 4,
-    pairs: [
-      { id: "p1", left: "door", right: "key", leftName: "Door", rightName: "Key" },
-      { id: "p2", left: "chair", right: "couch", leftName: "Chair", rightName: "Couch" },
-      { id: "p3", left: "baby", right: "baby_bottle", leftName: "Baby", rightName: "Bottle" }
-    ]
-  },
-  {
-    level: 5,
-    pairs: [
-      { id: "p1", left: "cooking_pot", right: "spoon", leftName: "Pot", rightName: "Spoon" },
-      { id: "p2", left: "book", right: "bookmark", leftName: "Book", rightName: "Bookmark" },
-      { id: "p3", left: "bowl", right: "spoon", leftName: "Bowl", rightName: "Spoon" }
-    ]
-  },
+import { GAME_CONFIG } from './game-config.js';
+import { LEVELS_CONFIG } from './level-config.js';
+import {
+  SoundEngine,
+  FlowerParticleSystem,
+  ProgressManager,
+  SparkyController
+} from './game-logic.js';
 
-  // Levels 6-10: Home & Living (3-4 pairs)
-  {
-    level: 6,
-    pairs: [
-      { id: "p1", left: "bed", right: "couch", leftName: "Bed", rightName: "Couch" },
-      { id: "p2", left: "plate", right: "fork", leftName: "Plate", rightName: "Fork" },
-      { id: "p3", left: "soap", right: "sponge", leftName: "Soap", rightName: "Sponge" }
-    ]
-  },
-  {
-    level: 7,
-    pairs: [
-      { id: "p1", left: "door", right: "window", leftName: "Door", rightName: "Window" },
-      { id: "p2", left: "bulb", right: "flashlight", leftName: "Bulb", rightName: "Flashlight" },
-      { id: "p3", left: "chair", right: "couch", leftName: "Chair", rightName: "Couch" },
-      { id: "p4", left: "bathtub", right: "soap", leftName: "Bathtub", rightName: "Soap" }
-    ]
-  },
-  {
-    level: 8,
-    pairs: [
-      { id: "p1", left: "pan", right: "egg", leftName: "Pan", rightName: "Egg" },
-      { id: "p2", left: "book", right: "bookmark", leftName: "Book", rightName: "Bookmark" },
-      { id: "p3", left: "lock", right: "key", leftName: "Lock", rightName: "Key" },
-      { id: "p4", left: "bowl", right: "spoon", leftName: "Bowl", rightName: "Spoon" }
-    ]
-  },
-  {
-    level: 9,
-    pairs: [
-      { id: "p1", left: "cup", right: "teapot", leftName: "Cup", rightName: "Teapot" },
-      { id: "p2", left: "toothbrush", right: "tooth", leftName: "Toothbrush", rightName: "Tooth" },
-      { id: "p3", left: "shoe", right: "sock", leftName: "Shoe", rightName: "Sock" },
-      { id: "p4", left: "baby", right: "baby_bottle", leftName: "Baby", rightName: "Bottle" }
-    ]
-  },
-  {
-    level: 10,
-    pairs: [
-      { id: "p1", left: "sponge", right: "soap", leftName: "Sponge", rightName: "Soap" },
-      { id: "p2", left: "fork", right: "plate", leftName: "Fork", rightName: "Plate" },
-      { id: "p3", left: "door", right: "key", leftName: "Door", rightName: "Key" },
-      { id: "p4", left: "bulb", right: "flashlight", leftName: "Bulb", rightName: "Flashlight" }
-    ]
-  },
-
-  // Levels 11-15: School & Learning (4 pairs)
-  {
-    level: 11,
-    pairs: [
-      { id: "p1", left: "pencil", right: "notebook", leftName: "Pencil", rightName: "Notebook" },
-      { id: "p2", left: "crayon", right: "paper", leftName: "Crayon", rightName: "Paper" },
-      { id: "p3", left: "scissors", right: "paperclip", leftName: "Scissors", rightName: "Paperclip" },
-      { id: "p4", left: "backpack", right: "books", leftName: "Backpack", rightName: "Books" }
-    ]
-  },
-  {
-    level: 12,
-    pairs: [
-      { id: "p1", left: "paintbrush", right: "palette", leftName: "Paintbrush", rightName: "Palette" },
-      { id: "p2", left: "scissors", right: "paperclip", leftName: "Scissors", rightName: "Paperclip" },
-      { id: "p3", left: "ruler", right: "pencil", leftName: "Ruler", rightName: "Pencil" },
-      { id: "p4", left: "book", right: "bookmark", leftName: "Book", rightName: "Bookmark" }
-    ]
-  },
-  {
-    level: 13,
-    pairs: [
-      { id: "p1", left: "crayon", right: "paper", leftName: "Crayon", rightName: "Paper" },
-      { id: "p2", left: "backpack", right: "books", leftName: "Backpack", rightName: "Books" },
-      { id: "p3", left: "pencil", right: "ruler", leftName: "Pencil", rightName: "Ruler" },
-      { id: "p4", left: "paintbrush", right: "palette", leftName: "Paintbrush", rightName: "Palette" }
-    ]
-  },
-  {
-    level: 14,
-    pairs: [
-      { id: "p1", left: "notebook", right: "pencil", leftName: "Notebook", rightName: "Pencil" },
-      { id: "p2", left: "paperclip", right: "paper", leftName: "Paperclip", rightName: "Paper" },
-      { id: "p3", left: "backpack", right: "ruler", leftName: "Backpack", rightName: "Ruler" },
-      { id: "p4", left: "book", right: "bookmark", leftName: "Book", rightName: "Bookmark" }
-    ]
-  },
-  {
-    level: 15,
-    pairs: [
-      { id: "p1", left: "paintbrush", right: "palette", leftName: "Paintbrush", rightName: "Palette" },
-      { id: "p2", left: "crayon", right: "notebook", leftName: "Crayon", rightName: "Notebook" },
-      { id: "p3", left: "scissors", right: "paper", leftName: "Scissors", rightName: "Paper" },
-      { id: "p4", left: "backpack", right: "books", leftName: "Backpack", rightName: "Books" }
-    ]
-  },
-
-  // Levels 16-20: Animals & Habitats (4 pairs)
-  {
-    level: 16,
-    pairs: [
-      { id: "p1", left: "bird", right: "nest", leftName: "Bird", rightName: "Nest" },
-      { id: "p2", left: "bee", right: "honey", leftName: "Honeybee", rightName: "Honey" },
-      { id: "p3", left: "fish", right: "wave", leftName: "Fish", rightName: "Water" },
-      { id: "p4", left: "dog", right: "bone", leftName: "Dog", rightName: "Bone" }
-    ]
-  },
-  {
-    level: 17,
-    pairs: [
-      { id: "p1", left: "rabbit", right: "carrot", leftName: "Rabbit", rightName: "Carrot" },
-      { id: "p2", left: "spider", right: "web", leftName: "Spider", rightName: "Web" },
-      { id: "p3", left: "cat", right: "mouse", leftName: "Cat", rightName: "Mouse" },
-      { id: "p4", left: "bee", right: "sunflower", leftName: "Bee", rightName: "Sunflower" }
-    ]
-  },
-  {
-    level: 18,
-    pairs: [
-      { id: "p1", left: "butterfly", right: "tulip", leftName: "Butterfly", rightName: "Flower" },
-      { id: "p2", left: "dog", right: "bone", leftName: "Dog", rightName: "Bone" },
-      { id: "p3", left: "bird", right: "nest", leftName: "Bird", rightName: "Nest" },
-      { id: "p4", left: "fish", right: "wave", leftName: "Fish", rightName: "Water" }
-    ]
-  },
-  {
-    level: 19,
-    pairs: [
-      { id: "p1", left: "rabbit", right: "carrot", leftName: "Rabbit", rightName: "Carrot" },
-      { id: "p2", left: "spider", right: "web", leftName: "Spider", rightName: "Web" },
-      { id: "p3", left: "cat", right: "mouse", leftName: "Cat", rightName: "Mouse" },
-      { id: "p4", left: "bee", right: "honey", leftName: "Bee", rightName: "Honey" }
-    ]
-  },
-  {
-    level: 20,
-    pairs: [
-      { id: "p1", left: "butterfly", right: "sunflower", leftName: "Butterfly", rightName: "Sunflower" },
-      { id: "p2", left: "dog", right: "bone", leftName: "Dog", rightName: "Bone" },
-      { id: "p3", left: "bird", right: "nest", leftName: "Bird", rightName: "Nest" },
-      { id: "p4", left: "rabbit", right: "carrot", leftName: "Rabbit", rightName: "Carrot" }
-    ]
-  },
-
-  // Levels 21-25: Food & Delicacies (4 pairs)
-  {
-    level: 21,
-    pairs: [
-      { id: "p1", left: "bread", right: "butter", leftName: "Bread", rightName: "Butter" },
-      { id: "p2", left: "cookie", right: "milk", leftName: "Cookie", rightName: "Milk" },
-      { id: "p3", left: "cupcake", right: "ice_cream", leftName: "Cupcake", rightName: "Ice Cream" },
-      { id: "p4", left: "cup", right: "teapot", leftName: "Cup", rightName: "Teapot" }
-    ]
-  },
-  {
-    level: 22,
-    pairs: [
-      { id: "p1", left: "pan", right: "egg", leftName: "Pan", rightName: "Egg" },
-      { id: "p2", left: "bowl", right: "spoon", leftName: "Bowl", rightName: "Spoon" },
-      { id: "p3", left: "bread", right: "butter", leftName: "Bread", rightName: "Butter" },
-      { id: "p4", left: "cookie", right: "milk", leftName: "Cookie", rightName: "Milk" }
-    ]
-  },
-  {
-    level: 23,
-    pairs: [
-      { id: "p1", left: "cupcake", right: "ice_cream", leftName: "Cupcake", rightName: "Ice Cream" },
-      { id: "p2", left: "cooking_pot", right: "spoon", leftName: "Pot", rightName: "Spoon" },
-      { id: "p3", left: "fork", right: "plate", leftName: "Fork", rightName: "Plate" },
-      { id: "p4", left: "bread", right: "butter", leftName: "Bread", rightName: "Butter" }
-    ]
-  },
-  {
-    level: 24,
-    pairs: [
-      { id: "p1", left: "pan", right: "egg", leftName: "Pan", rightName: "Egg" },
-      { id: "p2", left: "cookie", right: "milk", leftName: "Cookie", rightName: "Milk" },
-      { id: "p3", left: "cup", right: "teapot", leftName: "Cup", rightName: "Teapot" },
-      { id: "p4", left: "bowl", right: "spoon", leftName: "Bowl", rightName: "Spoon" }
-    ]
-  },
-  {
-    level: 25,
-    pairs: [
-      { id: "p1", left: "bread", right: "butter", leftName: "Bread", rightName: "Butter" },
-      { id: "p2", left: "cupcake", right: "ice_cream", leftName: "Cupcake", rightName: "Ice Cream" },
-      { id: "p3", left: "pan", right: "egg", leftName: "Pan", rightName: "Egg" },
-      { id: "p4", left: "fork", right: "plate", leftName: "Fork", rightName: "Plate" }
-    ]
-  },
-
-  // Levels 26-30: Nature, Fun & Functional Associations (4 to 5 pairs)
-  {
-    level: 26,
-    pairs: [
-      { id: "p1", left: "rain", right: "umbrella", leftName: "Rain", rightName: "Umbrella" },
-      { id: "p2", left: "sun", right: "sunglasses", leftName: "Sun", rightName: "Sunglasses" },
-      { id: "p3", left: "moon", right: "star", leftName: "Moon", rightName: "Star" },
-      { id: "p4", left: "fire", right: "wood", leftName: "Fire", rightName: "Wood" }
-    ]
-  },
-  {
-    level: 27,
-    pairs: [
-      { id: "p1", left: "train", right: "track", leftName: "Train", rightName: "Track" },
-      { id: "p2", left: "plant", right: "seedling", leftName: "Plant", rightName: "Seedling" },
-      { id: "p3", left: "drum", right: "guitar", leftName: "Drum", rightName: "Guitar" },
-      { id: "p4", left: "gift", right: "balloon", leftName: "Gift", rightName: "Balloon" }
-    ]
-  },
-  {
-    level: 28,
-    pairs: [
-      { id: "p1", left: "crown", right: "gem", leftName: "Crown", rightName: "Gem" },
-      { id: "p2", left: "trophy", right: "medal", leftName: "Trophy", rightName: "Medal" },
-      { id: "p3", left: "rain", right: "umbrella", leftName: "Rain", rightName: "Umbrella" },
-      { id: "p4", left: "sun", right: "sunglasses", leftName: "Sun", rightName: "Sunglasses" },
-      { id: "p5", left: "moon", right: "star", leftName: "Moon", rightName: "Star" }
-    ]
-  },
-  {
-    level: 29,
-    pairs: [
-      { id: "p1", left: "fire", right: "wood", leftName: "Fire", rightName: "Wood" },
-      { id: "p2", left: "train", right: "track", leftName: "Train", rightName: "Track" },
-      { id: "p3", left: "drum", right: "guitar", leftName: "Drum", rightName: "Guitar" },
-      { id: "p4", left: "gift", right: "balloon", leftName: "Gift", rightName: "Balloon" },
-      { id: "p5", left: "plant", right: "seedling", leftName: "Plant", rightName: "Seedling" }
-    ]
-  },
-  {
-    level: 30,
-    pairs: [
-      { id: "p1", left: "crown", right: "gem", leftName: "Crown", rightName: "Gem" },
-      { id: "p2", left: "trophy", right: "medal", leftName: "Trophy", rightName: "Medal" },
-      { id: "p3", left: "sun", right: "sunglasses", leftName: "Sun", rightName: "Sunglasses" },
-      { id: "p4", left: "train", right: "track", leftName: "Train", rightName: "Track" },
-      { id: "p5", left: "rain", right: "umbrella", leftName: "Rain", rightName: "Umbrella" }
-    ]
-  }
-];
-
-// Helper to construct asset paths
-function getAssetPath(assetName) {
-  return `assets/svgs/${assetName}.svg`;
-}
-
-// 2. AUDIO SYNTHESIZER & BGM
-class SoundEngine {
+class MatchPairApp {
   constructor() {
-    this.ctx = null;
-    this.muted = false;
-    this.bgm = null;
-  }
+    this.levels = LEVELS_CONFIG;
+    this.sound = new SoundEngine();
+    this.progress = new ProgressManager(GAME_CONFIG.storageKey);
+    this.sparky = new SparkyController(this.sound);
 
-  init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-      }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-    if (!this.bgm) {
-      this.bgm = new Audio('bgm.mp3');
-      this.bgm.loop = true;
-      this.bgm.volume = 0.25;
-      this.bgm.play().catch(() => {});
-    } else if (this.bgm.paused && !this.muted) {
-      this.bgm.play().catch(() => {});
-    }
-  }
+    // Particle FX
+    const fxCanvas = document.getElementById('fx-canvas');
+    const titleCanvas = document.getElementById('title-fx-canvas');
+    this.fx = new FlowerParticleSystem(fxCanvas);
+    this.titleFx = new FlowerParticleSystem(titleCanvas);
 
-  toggleMute() {
-    this.muted = !this.muted;
-    if (this.bgm) {
-      this.bgm.muted = this.muted;
-    }
-    return this.muted;
-  }
+    // Connection Canvas & Context
+    this.connCanvas = document.getElementById('connection-canvas');
+    this.connCtx = this.connCanvas.getContext('2d');
 
-  playTap() {
-    if (this.muted || !this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const now = this.ctx.currentTime;
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(540, now);
-      osc.frequency.exponentialRampToValueAtTime(220, now + 0.08);
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.09);
-    } catch (e) {}
-  }
-
-  playSelect() {
-    if (this.muted || !this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const now = this.ctx.currentTime;
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(620, now);
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.13);
-    } catch (e) {}
-  }
-
-  playCorrect() {
-    if (this.muted || !this.ctx) return;
-    try {
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-      const now = this.ctx.currentTime;
-      notes.forEach((freq, idx) => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const startTime = now + idx * 0.07;
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(0.28, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(startTime);
-        osc.stop(startTime + 0.36);
-      });
-    } catch (e) {}
-  }
-
-  playWrong() {
-    if (this.muted || !this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const now = this.ctx.currentTime;
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.23);
-    } catch (e) {}
-  }
-
-  playLevelComplete() {
-    if (this.muted || !this.ctx) return;
-    try {
-      const melody = [
-        { f: 523.25, t: 0 },
-        { f: 659.25, t: 0.12 },
-        { f: 783.99, t: 0.24 },
-        { f: 1046.5, t: 0.36 },
-        { f: 880.00, t: 0.54 },
-        { f: 1046.5, t: 0.72 }
-      ];
-      const now = this.ctx.currentTime;
-      melody.forEach(item => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const noteStart = now + item.t;
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(item.f, noteStart);
-        gain.gain.setValueAtTime(0.3, noteStart);
-        gain.gain.exponentialRampToValueAtTime(0.001, noteStart + 0.4);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(noteStart);
-        osc.stop(noteStart + 0.42);
-      });
-    } catch (e) {}
-  }
-}
-
-const sounds = new SoundEngine();
-
-// 3. MASCOT SPARKY GENERATOR
-function getSparkySVG(mood = 'idle') {
-  let eyeLeft = `<circle cx="34" cy="40" r="6" fill="#293241"/><circle cx="36" cy="38" r="2.2" fill="#FFF"/>`;
-  let eyeRight = `<circle cx="46" cy="40" r="6" fill="#293241"/><circle cx="48" cy="38" r="2.2" fill="#FFF"/>`;
-  let mouth = `<path d="M35 49 Q40 54 45 49" stroke="#293241" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
-  let arms = `
-    <path d="M18 46 Q10 48 12 55" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <path d="M62 46 Q70 48 68 55" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-  `;
-  let extras = '';
-
-  if (mood === 'curious') {
-    eyeLeft = `<circle cx="33" cy="38" r="7" fill="#293241"/><circle cx="35" cy="36" r="2.5" fill="#FFF"/>`;
-    eyeRight = `<circle cx="47" cy="40" r="5" fill="#293241"/><circle cx="48" cy="39" r="1.8" fill="#FFF"/>`;
-    mouth = `<ellipse cx="40" cy="50" rx="3.5" ry="4" fill="#293241"/>`;
-    extras = `<text x="56" y="24" font-size="14" font-weight="900" fill="#FF8F3D">?</text>`;
-  } else if (mood === 'happy') {
-    eyeLeft = `<path d="M29 41 Q34 35 39 41" stroke="#293241" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-    eyeRight = `<path d="M41 41 Q46 35 51 41" stroke="#293241" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-    mouth = `<path d="M34 47 Q40 58 46 47 Z" fill="#FF5252" stroke="#293241" stroke-width="2"/>`;
-    arms = `
-      <path d="M18 44 Q10 32 14 26" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <path d="M62 44 Q70 32 66 26" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-    `;
-    extras = `
-      <circle cx="22" cy="22" r="3" fill="#FFC83D"/>
-      <circle cx="58" cy="22" r="3" fill="#FFC83D"/>
-    `;
-  } else if (mood === 'thinking') {
-    eyeLeft = `<line x1="30" y1="40" x2="38" y2="40" stroke="#293241" stroke-width="3" stroke-linecap="round"/>`;
-    eyeRight = `<circle cx="46" cy="39" r="5.5" fill="#293241"/><circle cx="47" cy="37" r="2" fill="#FFF"/>`;
-    mouth = `<path d="M36 51 Q40 48 44 52" stroke="#293241" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
-    arms = `
-      <path d="M18 46 Q10 48 12 55" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <path d="M62 46 Q64 40 50 48" stroke="#FF6B00" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-    `;
-  } else if (mood === 'celebrate') {
-    eyeLeft = `<path d="M29 40 Q34 33 39 40" stroke="#293241" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
-    eyeRight = `<path d="M41 40 Q46 33 51 40" stroke="#293241" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
-    mouth = `<path d="M33 46 Q40 60 47 46 Z" fill="#FF3B30" stroke="#293241" stroke-width="2.5"/>`;
-    arms = `
-      <path d="M18 40 Q8 25 15 18" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <path d="M62 40 Q72 25 65 18" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" fill="none"/>
-    `;
-    extras = `
-      <polygon points="40,6 42,12 48,12 43,16 45,22 40,18 35,22 37,16 32,12 38,12" fill="#FFC83D"/>
-      <circle cx="20" cy="12" r="3" fill="#70D98B"/>
-      <circle cx="60" cy="12" r="3" fill="#6EC8FF"/>
-    `;
-  }
-
-  return `
-    <svg viewBox="0 0 80 80" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="40" y1="20" x2="40" y2="12" stroke="#293241" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="40" cy="10" r="5" fill="#FFC83D" stroke="#293241" stroke-width="2"/>
-      ${arms}
-      <rect x="20" y="20" width="40" height="42" rx="18" fill="#FF8F3D" stroke="#293241" stroke-width="3"/>
-      <rect x="25" y="27" width="30" height="28" rx="10" fill="#FFF3DB" stroke="#E2C99D" stroke-width="1.5"/>
-      <ellipse cx="28" cy="44" rx="3" ry="2" fill="#FFB0B0"/>
-      <ellipse cx="52" cy="44" rx="3" ry="2" fill="#FFB0B0"/>
-      ${eyeLeft}
-      ${eyeRight}
-      ${mouth}
-      <rect x="15" y="34" width="5" height="12" rx="2" fill="#FFC83D" stroke="#293241" stroke-width="2"/>
-      <rect x="60" y="34" width="5" height="12" rx="2" fill="#FFC83D" stroke="#293241" stroke-width="2"/>
-      <rect x="29" y="60" width="7" height="10" rx="3" fill="#FF6B00" stroke="#293241" stroke-width="2.5"/>
-      <rect x="44" y="60" width="7" height="10" rx="3" fill="#FF6B00" stroke="#293241" stroke-width="2.5"/>
-      ${extras}
-    </svg>
-  `;
-}
-
-// 4. CONFETTI CELEBRATION
-class ConfettiManager {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.particles = [];
-    this.animating = false;
-  }
-
-  resize() {
-    this.canvas.width = this.canvas.parentElement.clientWidth;
-    this.canvas.height = this.canvas.parentElement.clientHeight;
-  }
-
-  burst() {
-    this.resize();
-    this.particles = [];
-    const colors = ['#FF6B00', '#FFC83D', '#6EC8FF', '#70D98B', '#A88BFF', '#FF8DA1'];
-    for (let i = 0; i < 75; i++) {
-      this.particles.push({
-        x: this.canvas.width / 2 + (Math.random() - 0.5) * 80,
-        y: this.canvas.height / 2 - 40,
-        vx: (Math.random() - 0.5) * 14,
-        vy: -Math.random() * 12 - 4,
-        size: Math.random() * 8 + 6,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rotation: Math.random() * 360,
-        spin: (Math.random() - 0.5) * 12,
-        shape: Math.random() > 0.4 ? 'rect' : 'circle',
-        opacity: 1
-      });
-    }
-
-    if (!this.animating) {
-      this.animating = true;
-      this.update();
-    }
-  }
-
-  update() {
-    if (!this.animating) return;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    let activeCount = 0;
-    for (let p of this.particles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.4;
-      p.rotation += p.spin;
-      p.opacity -= 0.012;
-
-      if (p.opacity > 0) {
-        activeCount++;
-        this.ctx.save();
-        this.ctx.globalAlpha = Math.max(0, p.opacity);
-        this.ctx.translate(p.x, p.y);
-        this.ctx.rotate((p.rotation * Math.PI) / 180);
-        this.ctx.fillStyle = p.color;
-
-        if (p.shape === 'rect') {
-          this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
-        } else {
-          this.ctx.beginPath();
-          this.ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-          this.ctx.fill();
-        }
-        this.ctx.restore();
-      }
-    }
-
-    if (activeCount > 0) {
-      requestAnimationFrame(() => this.update());
-    } else {
-      this.animating = false;
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-  }
-}
-
-// 5. GAME ENGINE
-class MatchGame {
-  constructor() {
+    // Gameplay State
     this.currentLevelIndex = 0;
     this.selectedCard = null;
     this.matchedPairsCount = 0;
     this.totalPairsCount = 0;
-    this.xp = 0;
     this.isPaused = false;
     this.isInputBlocked = false;
+    this.dialogueSession = 0;
 
-    this.hintTimer = null;
-    this.hintInterval = 6000;
-
-    this.canvas = document.getElementById('connection-canvas');
-    this.ctx = this.canvas.getContext('2d');
-    this.confetti = new ConfettiManager(document.getElementById('confetti-canvas'));
-
+    // Drag pairing state
     this.isDragging = false;
     this.dragStartPos = { x: 0, y: 0 };
     this.dragCurrentPos = { x: 0, y: 0 };
 
-    this.initMascotUI();
-    this.bindEvents();
+    // Tutorial helper
+    this.tutorialInterval = null;
+
+    this.init();
   }
 
-  initMascotUI() {
-    document.getElementById('intro-sparky-box').innerHTML = getSparkySVG('happy');
-    document.getElementById('game-sparky-box').innerHTML = getSparkySVG('idle');
-    document.getElementById('complete-sparky-box').innerHTML = getSparkySVG('celebrate');
-    
-    // Set intro cards with SVG assets
-    document.getElementById('intro-shoe-box').innerHTML = `<img src="${getAssetPath('shoe')}" alt="Shoe">`;
-    document.getElementById('intro-sock-box').innerHTML = `<img src="${getAssetPath('sock')}" alt="Sock">`;
+  init() {
+    // Sync sound state from saved progress
+    if (this.progress.soundMuted) {
+      this.sound.setMute(true);
+    }
+    this.updateSoundButtonsUI();
+    this.updateRibbonStats();
+
+    // Set initial mascot faces
+    this.sparky.setSpriteFrame(document.getElementById('game-sparky-face'), 'idle');
+    this.sparky.setSpriteFrame(document.getElementById('pause-sparky-face'), 'peeking');
+    this.sparky.setSpriteFrame(document.getElementById('complete-sparky-face'), 'celebrate');
+
+    this.bindDOMEvents();
   }
 
-  setMascotMood(mood, text = null) {
-    const box = document.getElementById('game-sparky-box');
-    box.innerHTML = getSparkySVG(mood);
+  updateSoundButtonsUI() {
+    const isMuted = this.sound.muted;
+    const menuIcon = document.getElementById('menu-sound-icon');
+    const gameIcon = document.getElementById('game-sound-icon');
+    if (menuIcon) {
+      menuIcon.innerHTML = isMuted
+        ? `<svg class="sound-speaker-svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" opacity="0.3"/>
+            <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+           </svg>`
+        : `<svg class="sound-speaker-svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+           </svg>`;
+    }
+    // Reuse the same illustrated speaker in both the menu and gameplay HUD.
+    if (gameIcon && menuIcon) gameIcon.innerHTML = menuIcon.innerHTML;
+    ['btn-sound-menu', 'btn-sound'].forEach((id) => {
+      const button = document.getElementById(id);
+      if (button) {
+        button.setAttribute('aria-label', isMuted ? 'Turn sound on' : 'Turn sound off');
+        button.setAttribute('aria-pressed', String(isMuted));
+      }
+    });
+  }
 
-    const speech = document.getElementById('sparky-speech-bubble');
-    if (text) {
-      speech.textContent = text;
-      speech.classList.add('active');
-      clearTimeout(this.speechTimeout);
-      this.speechTimeout = setTimeout(() => {
-        speech.classList.remove('active');
-      }, 1600);
+  updateRibbonStats() {
+    const levelInd = document.getElementById('menu-level-indicator');
+    const starInd = document.getElementById('menu-star-indicator');
+    const xpVal = document.getElementById('hud-xp-val');
+
+    if (levelInd) {
+      levelInd.textContent = `${this.progress.unlockedLevel}/${this.levels.length}`;
+    }
+    if (starInd) {
+      starInd.textContent = this.progress.xp || this.progress.stars || 0;
+    }
+    if (xpVal) {
+      xpVal.textContent = this.progress.xp || 0;
     }
   }
 
-  bindEvents() {
-    document.getElementById('btn-start-game').addEventListener('click', () => {
-      sounds.init();
-      sounds.playTap();
-      this.showScreen('game-screen');
-      this.startLevel(0);
-    });
+  bindDOMEvents() {
+    // 1. Play Button on Home Screen
+    const btnPlay = document.getElementById('btn-start-game');
+    if (btnPlay) {
+      btnPlay.addEventListener('click', () => {
+        this.sound.startBGM();
+        this.sound.playTap();
+        // Start current level based on progress
+        const startLvlIdx = Math.max(0, Math.min(this.progress.currentLevel - 1, this.levels.length - 1));
+        this.showScreen('game-screen');
+        this.startLevel(startLvlIdx);
+      });
+    }
 
-    const btnSound = document.getElementById('btn-sound');
-    btnSound.addEventListener('click', () => {
-      sounds.init();
-      const muted = sounds.toggleMute();
-      btnSound.textContent = muted ? '🔇' : '🔊';
-      sounds.playTap();
-    });
+    // 2. Levels Screen Opening & Closing
+    const btnOpenLevels = document.getElementById('btn-open-levels');
+    if (btnOpenLevels) {
+      btnOpenLevels.addEventListener('click', () => {
+        this.sound.playTap();
+        this.openLevelsScreen();
+      });
+    }
 
-    document.getElementById('btn-pause').addEventListener('click', () => {
-      sounds.init();
-      sounds.playTap();
-      this.pauseGame();
-    });
+    const btnCloseLevels = document.getElementById('btn-close-levels');
+    if (btnCloseLevels) {
+      btnCloseLevels.addEventListener('click', () => {
+        this.sound.playTap();
+        this.closeLevelsScreen();
+      });
+    }
 
-    document.getElementById('btn-resume').addEventListener('click', () => {
-      sounds.playTap();
-      this.resumeGame();
-    });
+    // 3. Hero Sparky on Home Screen (Interactive dialogue & flower burst & SparkyArt2 swap!)
+    const heroSparky = document.getElementById('menu-sparky-btn');
+    const heroSparkyImg = document.getElementById('menu-sparky-img');
+    let heroSparkySwapTimer = null;
+    if (heroSparky) {
+      const triggerHeroSparky = () => {
+        this.sound.init();
+        this.sound.playTap();
+        const rect = heroSparky.getBoundingClientRect();
+        this.titleFx.spawnTitleFlowers(rect.left + rect.width / 2, rect.top + rect.height / 2);
 
-    document.getElementById('btn-restart').addEventListener('click', () => {
-      sounds.playTap();
-      this.resumeGame();
-      this.startLevel(this.currentLevelIndex);
-    });
+        // Tactile press & SparkyArt2 swap (like number balloon pop benchmark)
+        heroSparky.classList.add('sparky-pressed');
+        setTimeout(() => heroSparky.classList.remove('sparky-pressed'), 200);
 
-    document.getElementById('btn-home').addEventListener('click', () => {
-      sounds.playTap();
-      this.resumeGame();
-      this.showScreen('start-screen');
-    });
+        if (heroSparkyImg) {
+          heroSparkyImg.src = 'assets/SparkyArt2.png';
+          clearTimeout(heroSparkySwapTimer);
+          heroSparkySwapTimer = setTimeout(() => {
+            heroSparkyImg.src = 'assets/SparkyArt.png';
+          }, 2000);
+        }
 
-    document.getElementById('btn-next-level').addEventListener('click', () => {
-      sounds.playTap();
-      document.getElementById('complete-modal').classList.remove('active');
-      this.currentLevelIndex = (this.currentLevelIndex + 1) % LEVELS.length;
-      this.startLevel(this.currentLevelIndex);
-    });
+        // Play friendly greeting dialogue
+        const randomMenu = this.sparky.getRandomDialogue('menuDialogue');
+        if (randomMenu) {
+          this.sound.playDialogue(randomMenu.audio);
+        }
+      };
+      heroSparky.addEventListener('pointerdown', triggerHeroSparky);
+    }
 
-    document.getElementById('btn-replay-level').addEventListener('click', () => {
-      sounds.playTap();
-      document.getElementById('complete-modal').classList.remove('active');
-      this.startLevel(this.currentLevelIndex);
-    });
+    // 4. Sound Toggle Buttons (Menu & Game HUD)
+    const toggleSoundAction = () => {
+      this.sound.init();
+      const muted = this.sound.toggleMute();
+      this.progress.soundMuted = muted;
+      this.progress.save();
+      this.updateSoundButtonsUI();
+      this.sound.playTap();
+    };
 
-    window.addEventListener('resize', () => this.resizeCanvas());
+    const btnSoundMenu = document.getElementById('btn-sound-menu');
+    if (btnSoundMenu) {
+      btnSoundMenu.addEventListener('click', toggleSoundAction);
+    }
+    const btnSoundGame = document.getElementById('btn-sound');
+    if (btnSoundGame) {
+      btnSoundGame.addEventListener('click', toggleSoundAction);
+    }
 
+    // 5. In-game Pause Button & Modal
+    const btnPause = document.getElementById('btn-pause');
+    if (btnPause) {
+      btnPause.addEventListener('click', () => {
+        this.sound.playTap();
+        this.pauseGame();
+      });
+    }
+
+    const btnResume = document.getElementById('btn-resume');
+    if (btnResume) {
+      btnResume.addEventListener('click', () => {
+        this.sound.playTap();
+        this.resumeGame();
+      });
+    }
+
+    const btnRestart = document.getElementById('btn-restart');
+    if (btnRestart) {
+      btnRestart.addEventListener('click', () => {
+        this.sound.playTap();
+        this.resumeGame();
+        this.startLevel(this.currentLevelIndex);
+      });
+    }
+
+    const btnHome = document.getElementById('btn-home');
+    if (btnHome) {
+      btnHome.addEventListener('click', () => {
+        this.sound.playTap();
+        document.getElementById('pause-modal').classList.remove('active');
+        this.showScreen('start-screen');
+      });
+    }
+
+    // 6. Level Complete Modal Actions
+    const btnNextLevel = document.getElementById('btn-next-level');
+    if (btnNextLevel) {
+      btnNextLevel.addEventListener('click', () => {
+        this.sound.playTap();
+        document.getElementById('complete-modal').classList.remove('active');
+        this.currentLevelIndex = (this.currentLevelIndex + 1) % this.levels.length;
+        this.startLevel(this.currentLevelIndex);
+      });
+    }
+
+    const btnReplayLevel = document.getElementById('btn-replay-level');
+    if (btnReplayLevel) {
+      btnReplayLevel.addEventListener('click', () => {
+        this.sound.playTap();
+        document.getElementById('complete-modal').classList.remove('active');
+        this.startLevel(this.currentLevelIndex);
+      });
+    }
+
+    const btnCompleteHome = document.getElementById('btn-complete-home');
+    if (btnCompleteHome) {
+      btnCompleteHome.addEventListener('click', () => {
+        this.sound.playTap();
+        document.getElementById('complete-modal').classList.remove('active');
+        this.showScreen('start-screen');
+        this.openLevelsScreen();
+      });
+    }
+
+    // 7. Interactive Stage Pointer Events (Drag pairing lines)
     const stage = document.getElementById('stage-area');
-    stage.addEventListener('pointermove', (e) => this.handlePointerMove(e));
-    stage.addEventListener('pointerup', (e) => this.handlePointerUp(e));
-    stage.addEventListener('pointercancel', (e) => this.handlePointerUp(e));
+    if (stage) {
+      stage.addEventListener('pointermove', (e) => this.handlePointerMove(e));
+      stage.addEventListener('pointerup', (e) => this.handlePointerUp(e));
+      stage.addEventListener('pointercancel', (e) => this.handlePointerUp(e));
+    }
+
+    window.addEventListener('resize', () => {
+      this.resizeCanvas();
+      if (this.tutorialPairId) this.showTutorial(this.tutorialPairId);
+    });
   }
 
   showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    if (id !== 'game-screen') {
+      this.stopGameplayDialogue();
+      this.hideTutorial(true);
+    }
+    document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
+    const screen = document.getElementById(id);
+    if (screen) {
+      screen.classList.add('active');
+    }
     if (id === 'game-screen') {
       this.resizeCanvas();
     }
+    this.updateRibbonStats();
   }
 
   resizeCanvas() {
     const stage = document.getElementById('stage-area');
-    if (stage) {
-      this.canvas.width = stage.clientWidth;
-      this.canvas.height = stage.clientHeight;
+    if (stage && this.connCanvas) {
+      this.connCanvas.width = stage.clientWidth;
+      this.connCanvas.height = stage.clientHeight;
     }
   }
 
-  resetHintTimer() {
-    clearTimeout(this.hintTimer);
-    document.querySelectorAll('.game-card').forEach(c => c.classList.remove('hinting'));
-    this.hintTimer = setTimeout(() => this.triggerHint(), this.hintInterval);
-  }
-
-  triggerHint() {
-    if (this.isPaused || this.isInputBlocked) return;
-    const unmatched = Array.from(document.querySelectorAll('.game-card:not(.matched)'));
-    if (unmatched.length === 0) return;
-
-    const firstLeft = unmatched.find(c => c.dataset.side === 'left');
-    if (!firstLeft) return;
-    const matchingRight = unmatched.find(c => c.dataset.side === 'right' && c.dataset.pairId === firstLeft.dataset.pairId);
-
-    if (firstLeft && matchingRight) {
-      firstLeft.classList.add('hinting');
+  openLevelsScreen() {
+    this.hideTutorial(true);
+    this.stopGameplayDialogue();
+    this.renderLevelSelectGrid();
+    const el = document.getElementById('screen-levels');
+    if (el) {
+      el.classList.remove('hidden');
       setTimeout(() => {
-        if (!firstLeft.classList.contains('matched')) {
-          matchingRight.classList.add('hinting');
+        const currentBtn = document.querySelector('.level-button--current');
+        if (currentBtn) {
+          currentBtn.scrollIntoView({ block: 'center', behavior: 'smooth' });
         }
-      }, 350);
-      this.setMascotMood('curious', "Look here! 👀");
+      }, 80);
     }
   }
 
+  closeLevelsScreen() {
+    const el = document.getElementById('screen-levels');
+    if (el) {
+      el.classList.add('hidden');
+    }
+  }
+
+  renderLevelSelectGrid() {
+    const grid = document.getElementById('levels-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    this.levels.forEach((lvl, idx) => {
+      const levelNum = lvl.level;
+      const isUnlocked = this.progress.isUnlocked(levelNum);
+      const isCurrent = levelNum === this.progress.currentLevel;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `level-button ${isUnlocked ? 'level-button--unlocked' : 'level-button--locked'}${isCurrent ? ' level-button--current' : ''}`;
+      btn.setAttribute('aria-label', isUnlocked ? `Level ${levelNum}${isCurrent ? ', current' : ''}` : `Level ${levelNum}, locked`);
+
+      const content = document.createElement('span');
+      content.className = 'level-button-content';
+
+      if (isUnlocked) {
+        content.textContent = String(levelNum);
+        btn.addEventListener('click', () => {
+          this.sound.playTap();
+          this.progress.currentLevel = levelNum;
+          this.progress.save();
+          this.closeLevelsScreen();
+          this.showScreen('game-screen');
+          this.startLevel(levelNum - 1);
+        });
+      } else {
+        content.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+          </svg>
+        `;
+        btn.disabled = true;
+      }
+
+      btn.appendChild(content);
+      grid.appendChild(btn);
+    });
+  }
+
+  /**
+   * Start a specified level
+   */
   startLevel(index) {
+    this.hideTutorial(true);
+    this.pausedTutorialPairId = null;
+    this.stopGameplayDialogue();
+    this.isPaused = false;
     this.currentLevelIndex = index;
-    const levelData = LEVELS[index];
+    const levelData = this.levels[index];
+    this.progress.currentLevel = levelData.level;
+    this.progress.save();
+
     this.matchedPairsCount = 0;
     this.totalPairsCount = levelData.pairs.length;
     this.selectedCard = null;
     this.isInputBlocked = false;
     this.clearLine();
 
-    document.getElementById('hud-level-text').textContent = `LEVEL ${levelData.level}`;
-    const dotsContainer = document.getElementById('hud-dots');
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < this.totalPairsCount; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      dot.id = `dot-${i}`;
-      dotsContainer.appendChild(dot);
+    // Update HUD
+    const hudLevel = document.getElementById('hud-level-text');
+    if (hudLevel) {
+      hudLevel.textContent = `LEVEL ${levelData.level}`;
     }
 
-    this.setMascotMood('idle', 'Find the pairs!');
+    const dotsContainer = document.getElementById('hud-dots');
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < this.totalPairsCount; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.id = `dot-${i}`;
+        dotsContainer.appendChild(dot);
+      }
+    }
 
+    // Populate Left and Right cards
     const leftCol = document.getElementById('left-cards-col');
     const rightCol = document.getElementById('right-cards-col');
     leftCol.innerHTML = '';
@@ -776,22 +412,28 @@ class MatchGame {
       name: p.rightName
     }));
 
-    this.shuffleArray(leftItems);
-    this.shuffleArray(rightItems);
+    this.shuffle(leftItems);
+    this.shuffle(rightItems);
 
-    leftItems.forEach(item => {
-      const card = this.createCardElement(item);
-      leftCol.appendChild(card);
+    leftItems.forEach((item) => {
+      leftCol.appendChild(this.createCardElement(item));
     });
 
-    rightItems.forEach(item => {
-      const card = this.createCardElement(item);
-      rightCol.appendChild(card);
+    rightItems.forEach((item) => {
+      rightCol.appendChild(this.createCardElement(item));
     });
 
     this.resizeCanvas();
-    this.resetHintTimer();
 
+    // 1. Play Intro Dialogue on Level Start (intro alone or combination of intro/idle as requested)
+    this.playLevelStartDialogue();
+
+    // 2. Start Inactivity Idle Watcher (6-10 sec gap between actions)
+    this.sparky.startIdleWatcher(() => {
+      this.triggerInactivityIdle();
+    });
+
+    // 3. Show tutorial finger on Level 1
     if (levelData.level === 1) {
       this.showTutorial(levelData.pairs[0].id);
     } else {
@@ -799,7 +441,55 @@ class MatchGame {
     }
   }
 
-  shuffleArray(arr) {
+  /**
+   * Plays level start intro dialogue (supports intro alone or combinations of intro + idle)
+   */
+  async playLevelStartDialogue() {
+    const session = this.dialogueSession;
+    await this.sparky.speak('intro', 'welcome');
+    if (session !== this.dialogueSession || !this.isGameplayActive()) return;
+    // 40% chance of combination with an idle/encouragement prompt
+    if (Math.random() < 0.4) {
+      await new Promise(r => setTimeout(r, 400));
+      if (session === this.dialogueSession && this.isGameplayActive() && !this.selectedCard && this.matchedPairsCount === 0) {
+        await this.sparky.speak('idle', 'curious');
+      }
+    }
+  }
+
+  /**
+   * Called when player is inactive for 6-10 seconds
+   */
+  triggerInactivityIdle() {
+    if (!this.isGameplayActive() || this.isInputBlocked) return;
+    // Sparky is already demonstrating a pair; do not add competing idle hints.
+    if (this.tutorialPairId) return;
+    const unmatched = Array.from(document.querySelectorAll('.game-card:not(.matched)'));
+    if (unmatched.length === 0) return;
+
+    // Trigger visual hint on one unmatched card pair
+    const firstLeft = unmatched.find((c) => c.dataset.side === 'left');
+    if (firstLeft) {
+      const matchRight = unmatched.find(
+        (c) => c.dataset.side === 'right' && c.dataset.pairId === firstLeft.dataset.pairId
+      );
+      firstLeft.classList.add('hinting');
+      setTimeout(() => {
+        if (!firstLeft.classList.contains('matched') && matchRight) {
+          matchRight.classList.add('hinting');
+        }
+      }, 350);
+      setTimeout(() => {
+        firstLeft.classList.remove('hinting');
+        if (matchRight) matchRight.classList.remove('hinting');
+      }, 2500);
+    }
+
+    // Play Sparky idle encouragement voice dialogue with curious mood
+    this.sparky.speak('idle', 'curious');
+  }
+
+  shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -815,7 +505,7 @@ class MatchGame {
 
     card.innerHTML = `
       <div class="card-svg-box">
-        <img src="${getAssetPath(item.key)}" alt="${item.name}" loading="eager" />
+        <img src="assets/svgs/${item.key}.svg" alt="${item.name}" loading="eager" draggable="false" />
       </div>
     `;
 
@@ -825,18 +515,22 @@ class MatchGame {
 
   handleCardPointerDown(card, e) {
     if (this.isPaused || this.isInputBlocked || card.classList.contains('matched')) return;
-    this.resetHintTimer();
 
+    // Reset inactivity idle timer on user touch
+    this.sparky.resetIdleTimer();
+
+    // Tapping already selected card cancels selection
     if (this.selectedCard && this.selectedCard.element === card) {
       this.deselectAll();
-      sounds.playTap();
+      this.sound.playTap();
       return;
     }
 
+    // No card selected yet: Select this card and begin drag tracking
     if (!this.selectedCard) {
       this.selectCard(card);
-      sounds.playSelect();
-      this.setMascotMood('curious');
+      this.sound.playSelect();
+      this.sparky.setSpriteFrame(document.getElementById('game-sparky-face'), 'curious');
 
       this.isDragging = true;
       const rect = card.getBoundingClientRect();
@@ -849,13 +543,15 @@ class MatchGame {
       return;
     }
 
+    // Tapping another card on the SAME side: Switch selection
     if (this.selectedCard.side === card.dataset.side) {
       this.deselectAll();
       this.selectCard(card);
-      sounds.playSelect();
+      this.sound.playSelect();
       return;
     }
 
+    // Tapping card on OPPOSITE side: Evaluate pairing match!
     this.evaluateMatch(this.selectedCard.element, card);
   }
 
@@ -866,7 +562,7 @@ class MatchGame {
       x: e.clientX - stageRect.left,
       y: e.clientY - stageRect.top
     };
-    this.drawLine(this.dragStartPos, this.dragCurrentPos, '#FF8F3D', 5, [6, 6]);
+    this.drawLine(this.dragStartPos, this.dragCurrentPos, '#f97316', 6, [8, 6]);
   }
 
   handlePointerUp(e) {
@@ -876,7 +572,11 @@ class MatchGame {
     const targetEl = document.elementFromPoint(e.clientX, e.clientY);
     const targetCard = targetEl ? targetEl.closest('.game-card') : null;
 
-    if (targetCard && targetCard !== this.selectedCard.element && !targetCard.classList.contains('matched')) {
+    if (
+      targetCard &&
+      targetCard !== this.selectedCard.element &&
+      !targetCard.classList.contains('matched')
+    ) {
       if (targetCard.dataset.side !== this.selectedCard.side) {
         this.evaluateMatch(this.selectedCard.element, targetCard);
         return;
@@ -906,6 +606,7 @@ class MatchGame {
   evaluateMatch(cardA, cardB) {
     const isCorrect = cardA.dataset.pairId === cardB.dataset.pairId;
     this.isInputBlocked = true;
+    this.sparky.resetIdleTimer();
 
     const stageRect = document.getElementById('stage-area').getBoundingClientRect();
     const rectA = cardA.getBoundingClientRect();
@@ -921,17 +622,23 @@ class MatchGame {
     };
 
     if (isCorrect) {
-      this.drawLine(pA, pB, '#3EBD61', 7);
-      sounds.playCorrect();
-      this.setMascotMood('happy', 'Great! 🌟');
+      // Draw solid tactile green connecting curve
+      this.drawLine(pA, pB, '#22c55e', 7);
+      this.sound.playMatchSuccess();
+
+      // Flower Particle Pop Burst at both card centers!
+      this.fx.spawnPop(rectA.left + rectA.width / 2, rectA.top + rectA.height / 2, '#4ade80');
+      this.fx.spawnPop(rectB.left + rectB.width / 2, rectB.top + rectB.height / 2, '#38bdf8');
+
+      // Sparky Positive Feedback Dialogue & Expression
+      this.sparky.speak('positive', 'thumbsUp');
 
       cardA.classList.remove('selected');
       cardB.classList.remove('selected');
       cardA.classList.add('matched');
       cardB.classList.add('matched');
 
-      this.showToastFeedback();
-      this.showFloatingXP(rectA, rectB);
+      this.awardMatchReward();
 
       const dot = document.getElementById(`dot-${this.matchedPairsCount}`);
       if (dot) dot.classList.add('filled');
@@ -946,16 +653,15 @@ class MatchGame {
 
         if (this.matchedPairsCount >= this.totalPairsCount) {
           this.handleLevelComplete();
-        } else {
-          this.setMascotMood('idle');
-          this.resetHintTimer();
         }
       }, 700);
-
     } else {
-      this.drawLine(pA, pB, '#FF6B6B', 5, [6, 4]);
-      sounds.playWrong();
-      this.setMascotMood('thinking', 'Try again! 🤔');
+      // Draw red dashed line and wrong shake
+      this.drawLine(pA, pB, '#ef4444', 6, [8, 5]);
+      this.sound.playMatchWrong();
+
+      // Sparky Encouragement Wrong Dialogue
+      this.sparky.speak('wrong');
 
       cardA.classList.add('wrong');
       cardB.classList.add('wrong');
@@ -966,123 +672,187 @@ class MatchGame {
         this.clearLine();
         this.selectedCard = null;
         this.isInputBlocked = false;
-        this.setMascotMood('idle');
-        this.resetHintTimer();
-      }, 600);
+      }, 650);
     }
   }
 
   drawLine(p1, p2, color, width = 6, dash = []) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.save();
-    this.ctx.strokeStyle = color;
-    this.ctx.lineWidth = width;
-    this.ctx.lineCap = 'round';
-    this.ctx.setLineDash(dash);
+    this.connCtx.clearRect(0, 0, this.connCanvas.width, this.connCanvas.height);
+    this.connCtx.save();
+    this.connCtx.strokeStyle = color;
+    this.connCtx.lineWidth = width;
+    this.connCtx.lineCap = 'round';
+    this.connCtx.setLineDash(dash);
 
     const midX = (p1.x + p2.x) / 2;
-    const midY = (p1.y + p2.y) / 2 - 12;
+    const midY = (p1.y + p2.y) / 2 - 14;
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(p1.x, p1.y);
-    this.ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
-    this.ctx.stroke();
-    this.ctx.restore();
+    this.connCtx.beginPath();
+    this.connCtx.moveTo(p1.x, p1.y);
+    this.connCtx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+    this.connCtx.stroke();
+    this.connCtx.restore();
   }
 
   clearLine() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.connCtx.clearRect(0, 0, this.connCanvas.width, this.connCanvas.height);
   }
 
-  showToastFeedback() {
-    const praises = ['Great! 🌟', 'Yay! 🎉', 'Super! 🚀', 'Awesome! ✨', 'Bingo! 🎈'];
-    const text = praises[Math.floor(Math.random() * praises.length)];
-    const toast = document.getElementById('feedback-toast');
-    toast.textContent = text;
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 650);
-  }
-
-  showFloatingXP(rectA, rectB) {
-    this.xp += 10;
-    document.getElementById('hud-xp-val').textContent = this.xp;
-
-    const stageRect = document.getElementById('stage-area').getBoundingClientRect();
-    const xpFloat = document.createElement('div');
-    xpFloat.className = 'floating-xp';
-    xpFloat.textContent = '+10 XP';
-    xpFloat.style.left = `${(rectA.left + rectB.left) / 2 - stageRect.left}px`;
-    xpFloat.style.top = `${(rectA.top + rectB.top) / 2 - stageRect.top}px`;
-
-    document.getElementById('stage-area').appendChild(xpFloat);
-    setTimeout(() => xpFloat.remove(), 900);
+  awardMatchReward() {
+    this.progress.addXP(10);
+    this.progress.addStar();
+    this.updateRibbonStats();
   }
 
   handleLevelComplete() {
-    sounds.playLevelComplete();
-    this.confetti.burst();
+    this.stopGameplayDialogue();
+    this.sound.playLevelComplete();
 
+    // Celebration screen-wide flower burst
+    this.fx.spawnCelebrationBurst();
+
+    // Unlock next level in progression & save
+    const completedLevelNum = this.levels[this.currentLevelIndex].level;
+    this.progress.unlockLevel(completedLevelNum + 1);
+    this.progress.currentLevel = Math.min(completedLevelNum + 1, this.levels.length);
+    this.progress.save();
+    this.updateRibbonStats();
+
+    // Speak level complete dialogue
+    this.sparky.speak('levelcomplete');
+
+    // Update modal details and open
     setTimeout(() => {
-      document.getElementById('complete-sub-text').textContent = `Level ${LEVELS[this.currentLevelIndex].level} Complete! ⭐`;
+      const sub = document.getElementById('complete-sub-text');
+      if (sub) {
+        sub.textContent = `Level ${completedLevelNum} Complete! ⭐`;
+      }
+      this.sparky.setSpriteFrame(document.getElementById('complete-sparky-face'), 'celebrate');
       document.getElementById('complete-modal').classList.add('active');
-    }, 450);
+    }, 550);
   }
 
   showTutorial(targetPairId) {
+    this.hideTutorial(true);
     const leftCard = document.querySelector(`.game-card[data-side="left"][data-pair-id="${targetPairId}"]`);
     const rightCard = document.querySelector(`.game-card[data-side="right"][data-pair-id="${targetPairId}"]`);
-    if (!leftCard || !rightCard) return;
+    if (!leftCard || !rightCard || leftCard.classList.contains('matched') || !this.isGameplayActive()) return;
 
     const layer = document.getElementById('tutorial-layer');
-    const hand = document.getElementById('tutorial-hand');
+    const mascot = document.getElementById('game-sparky-face');
+    const anchor = document.getElementById('game-sparky-anchor');
+    const screenRect = document.getElementById('game-screen').getBoundingClientRect();
+    const homeRect = mascot.getBoundingClientRect();
+    this.tutorialPairId = targetPairId;
+    this.tutorialHome = { x: homeRect.left - screenRect.left, y: homeRect.top - screenRect.top, scale: homeRect.width / 96 };
+    anchor.classList.add('tutorial-away');
     layer.style.display = 'block';
+    layer.appendChild(mascot);
+    mascot.classList.add('tutorial-guide');
 
-    const stageRect = document.getElementById('stage-area').getBoundingClientRect();
-    const lRect = leftCard.getBoundingClientRect();
-    const rRect = rightCard.getBoundingClientRect();
-
-    const posLeft = {
-      x: lRect.left + lRect.width / 2 - stageRect.left - 15,
-      y: lRect.top + lRect.height / 2 - stageRect.top - 10
-    };
-    const posRight = {
-      x: rRect.left + rRect.width / 2 - stageRect.left - 15,
-      y: rRect.top + rRect.height / 2 - stageRect.top - 10
-    };
-
+    const transform = (point, facing = 1, scale = 1) =>
+      `translate(${point.x}px, ${point.y}px) scale(${facing * scale}, ${scale})`;
+    mascot.style.transform = transform(this.tutorialHome, 1, this.tutorialHome.scale);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let step = 0;
-    hand.style.transform = `translate(${posLeft.x}px, ${posLeft.y}px)`;
-
-    clearInterval(this.tutorialInterval);
-    this.tutorialInterval = setInterval(() => {
+    const pointAtCard = () => {
+      const card = step === 0 ? leftCard : rightCard;
+      const rect = card.querySelector('img').getBoundingClientRect();
+      const facing = step === 0 ? 1 : -1;
+      // The artwork's fingertip sits near the left edge, 72% down the image.
+      // Mirror only the right-hand visit so Sparky points inward at both items.
+      const target = {
+        x: step === 0 ? rect.right - screenRect.left - 4 : rect.left - screenRect.left - 92,
+        y: Math.max(0, Math.min(screenRect.height - 96, rect.top + rect.height / 2 - screenRect.top - 69))
+      };
+      leftCard.classList.toggle('tutorial-target', step === 0);
+      rightCard.classList.toggle('tutorial-target', step === 1);
+      const from = getComputedStyle(mascot).transform;
+      this.tutorialMotion?.cancel();
+      const to = transform(target, facing);
+      mascot.style.transform = to;
+      this.tutorialMotion = mascot.animate([{ transform: from }, { transform: to }], {
+        duration: reducedMotion ? 0 : 850,
+        easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+      });
       step = (step + 1) % 2;
-      const target = step === 0 ? posLeft : posRight;
-      hand.style.transform = `translate(${target.x}px, ${target.y}px)`;
-    }, 1200);
+    };
+    pointAtCard();
+    this.tutorialInterval = setInterval(pointAtCard, 2200);
   }
 
-  hideTutorial() {
+  hideTutorial(immediate = false) {
     clearInterval(this.tutorialInterval);
+    this.tutorialInterval = null;
+    this.tutorialPairId = null;
+    document.querySelectorAll('.tutorial-target').forEach(card => card.classList.remove('tutorial-target'));
     const layer = document.getElementById('tutorial-layer');
-    if (layer) layer.style.display = 'none';
+    const mascot = document.getElementById('game-sparky-face');
+    const anchor = document.getElementById('game-sparky-anchor');
+    if (!mascot.classList.contains('tutorial-guide')) return;
+    const from = getComputedStyle(mascot).transform;
+    this.tutorialMotion?.cancel();
+    const restore = () => {
+      anchor.appendChild(mascot);
+      mascot.classList.remove('tutorial-guide');
+      mascot.style.removeProperty('transform');
+      anchor.classList.remove('tutorial-away');
+      layer.style.display = 'none';
+      this.tutorialMotion = null;
+    };
+    if (immediate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      restore();
+      return;
+    }
+    const home = anchor.getBoundingClientRect();
+    const screen = document.getElementById('game-screen').getBoundingClientRect();
+    const to = `translate(${home.left - screen.left}px, ${home.top - screen.top}px) scale(${home.width / 96})`;
+    mascot.style.transform = to;
+    this.tutorialMotion = mascot.animate([{ transform: from }, { transform: to }], {
+      duration: 650,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+    });
+    const returnMotion = this.tutorialMotion;
+    returnMotion.finished.then(() => {
+      if (this.tutorialMotion === returnMotion) restore();
+    }).catch(() => {}); // Navigation or a restart may cancel the return flight.
   }
 
   pauseGame() {
+    this.pausedTutorialPairId = this.tutorialPairId;
+    this.hideTutorial(true);
     this.isPaused = true;
-    clearTimeout(this.hintTimer);
+    this.stopGameplayDialogue();
+    this.sparky.setSpriteFrame(document.getElementById('pause-sparky-face'), 'peeking');
     document.getElementById('pause-modal').classList.add('active');
   }
 
   resumeGame() {
     this.isPaused = false;
     document.getElementById('pause-modal').classList.remove('active');
-    this.resetHintTimer();
+    if (this.isGameplayActive()) {
+      this.sparky.startIdleWatcher(() => this.triggerInactivityIdle());
+      if (this.pausedTutorialPairId) this.showTutorial(this.pausedTutorialPairId);
+    }
+    this.pausedTutorialPairId = null;
+  }
+
+  isGameplayActive() {
+    return document.getElementById('game-screen').classList.contains('active') &&
+      document.getElementById('screen-levels').classList.contains('hidden') &&
+      !document.getElementById('complete-modal').classList.contains('active') &&
+      !this.isPaused && this.matchedPairsCount < this.totalPairsCount;
+  }
+
+  stopGameplayDialogue() {
+    this.dialogueSession++;
+    this.sparky.stopIdleWatcher();
+    this.sparky.cancelDialogue();
   }
 }
 
-// Start Game Instance upon DOM ready
+// Instantiate game when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-  window.game = new MatchGame();
+  window.gameApp = new MatchPairApp();
 });
+

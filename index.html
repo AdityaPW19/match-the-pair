@@ -3,24 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Match the Pair - Kids Learning Game</title>
+  <title>Match the Pair - Kids Educational Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="app-container">
 
-  <!-- Background Animated Doodles -->
-  <svg class="bg-doodles" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="50" cy="120" r="18" stroke="#FFE2BD" stroke-width="3" stroke-dasharray="4 4" />
-    <path d="M330 90 L345 115 L320 120 Z" stroke="#FFD8B3" stroke-width="2.5" fill="none" />
-    <circle cx="340" cy="380" r="28" stroke="#E6EEF8" stroke-width="3" stroke-dasharray="6 4" />
-    <path d="M40 500 Q 65 480 90 500 T 140 500" stroke="#FFE6C7" stroke-width="3" fill="none" />
-    <polygon points="50,720 58,736 76,738 62,750 66,768 50,758 34,768 38,750 24,738 42,736" stroke="#FFE3A8" stroke-width="2" fill="none" />
-    <circle cx="340" cy="690" r="14" stroke="#DFF4E5" stroke-width="3" />
-    <path d="M300 240 Q 320 220 340 240" stroke="#E6EEF8" stroke-width="3" fill="none" />
-    <line x1="20" y1="300" x2="60" y2="340" stroke="#FFE6C7" stroke-width="2.5" stroke-linecap="round" />
-  </svg>
+  <!-- Fullscreen Particle Effects Canvas (Flower Blooms & Celebration Confetti) -->
+  <canvas id="fx-canvas"></canvas>
 
   <!-- Landscape warning overlay -->
   <div id="landscape-overlay">
@@ -33,57 +27,129 @@
     <div class="landscape-text">Please turn your phone<br>to Portrait mode! 📱</div>
   </div>
 
-  <!-- START SCREEN -->
+  <!-- ========================================================================
+       1. START / HOME SCREEN
+       ======================================================================== -->
   <div id="start-screen" class="screen active">
-    <div class="game-logo">
-      <div class="game-title-main">MATCH THE<br>PAIR!</div>
-      <div class="game-title-sub">Logic & Thinking</div>
+    <!-- Top Progress Ribbon (from Reference Design) -->
+    <div class="menu-top-ribbon">
+      <div class="ribbon-pill ribbon-flag">
+        <svg class="ribbon-icon ribbon-icon--flag" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 21V4c3-1.5 6 1.5 9 0s5-1 6-1v10c-1.5.5-3.5 1-6 1s-6-1.5-9 0v7H5z"/>
+        </svg>
+        <span id="menu-level-indicator">1/30</span>
+      </div>
+      <div class="ribbon-pill ribbon-star">
+        <svg class="ribbon-icon ribbon-icon--star" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        <span id="menu-star-indicator">0</span>
+      </div>
     </div>
 
-    <div class="intro-showcase">
-      <div class="intro-card" id="intro-shoe-box"></div>
-      <div class="intro-connector">↔</div>
-      <div class="intro-card card-two" id="intro-sock-box"></div>
+    <!-- Title Art Group with Particle Canvas -->
+    <div class="game-logo-container">
+      <canvas id="title-fx-canvas" class="title-fx-canvas" aria-hidden="true"></canvas>
+      <div class="title-art-wrap">
+        <img class="title-art-img" src="assets/ui/title-Art.png" alt="Match The Pair - Logic & Thinking" draggable="false">
+      </div>
     </div>
 
-    <div class="intro-sparky-container" id="intro-sparky-box"></div>
+    <!-- Intro Showcase Graphic & Sparky -->
+    <div class="intro-center-stage">
+      <div class="main-menu-graphic-wrap">
+        <img class="main-menu-graphic-img" src="assets/ui/main-menu-graphic.png" alt="Match the shoes and socks" draggable="false">
+      </div>
 
-    <button id="btn-start-game" class="btn-play-big">
-      <span>PLAY</span>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <polygon points="5,3 19,12 5,21" />
-      </svg>
-    </button>
+      <!-- Hero Mascot Sparky -->
+      <div class="intro-sparky-wrapper" id="menu-sparky-btn" role="button" tabindex="0" aria-label="Sparky">
+        <img id="menu-sparky-img" class="intro-sparky-img" src="assets/SparkyArt.png" alt="Sparky mascot" draggable="false">
+      </div>
+    </div>
+
+    <!-- Bottom Actions: Play, Levels, Sound -->
+    <div class="menu-bottom-controls">
+      <button id="btn-start-game" class="btn-play-tactile" type="button">
+        <span class="play-text">
+          <span>PLAY</span>
+          <span class="play-arrow"></span>
+        </span>
+      </button>
+
+      <div class="menu-sub-row">
+        <button id="btn-sound-menu" class="btn-sound-bubble" type="button" aria-label="Sound Toggle">
+          <span id="menu-sound-icon">
+            <svg class="sound-speaker-svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          </span>
+        </button>
+
+        <button id="btn-open-levels" class="btn-levels-tactile" type="button">
+          <span class="levels-content-wrap">
+            <span class="levels-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="12" width="3.6" height="8" rx="1.8"/>
+                <rect x="9.2" y="7" width="3.6" height="13" rx="1.8"/>
+                <rect x="15.4" y="2" width="3.6" height="18" rx="1.8"/>
+              </svg>
+            </span>
+            <span>LEVELS</span>
+          </span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- MAIN GAME SCREEN -->
+  <!-- ========================================================================
+       2. MAIN IN-GAME SCREEN
+       ======================================================================== -->
   <div id="game-screen" class="screen">
     <!-- Top HUD -->
     <div class="top-hud">
-      <button id="btn-pause" class="hud-btn" aria-label="Pause">⏸</button>
+      <button id="btn-pause" class="hud-tactile-btn" aria-label="Pause">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+      </button>
       
-      <div class="progress-hud">
+      <div class="progress-hud-card">
         <div class="level-label" id="hud-level-text">LEVEL 1</div>
         <div class="dots-container" id="hud-dots"></div>
       </div>
 
-      <div style="display: flex; gap: 6px; align-items: center;">
+      <div class="hud-right-group">
         <div class="xp-pill" id="hud-xp-box">
           <span>⭐</span><span id="hud-xp-val">0</span>
         </div>
-        <button id="btn-sound" class="hud-btn" aria-label="Sound Toggle">🔊</button>
+        <button id="btn-sound" class="hud-tactile-btn" aria-label="Sound Toggle">
+          <span id="game-sound-icon">🔊</span>
+        </button>
       </div>
     </div>
 
-    <!-- Mascot Area -->
+    <!-- Mascot & Comic Speech Bubble Area (UI 1 & 2) -->
     <div class="mascot-strip">
-      <div class="sparky-wrapper" id="game-sparky-box"></div>
-      <div class="sparky-speech" id="sparky-speech-bubble">Let's Match!</div>
+      <div class="sparky-mascot-container" id="game-sparky-anchor">
+        <div class="sparky-rays" aria-hidden="true">
+          <span class="ray ray-1"></span>
+          <span class="ray ray-2"></span>
+          <span class="ray ray-3"></span>
+          <span class="ray ray-4"></span>
+        </div>
+        <div class="sparky sparky--idle" id="game-sparky-face" role="img" aria-label="Sparky"></div>
+      </div>
+      
+      <!-- Speech Bubble on Sparky's Right (from reference image) -->
+      <div class="sparky-speech-bubble" id="sparky-speech-bubble">
+        <span class="speech-bubble-tail"></span>
+        <span class="sparky-speech-text" id="sparky-speech-text">Find the pairs!</span>
+      </div>
     </div>
 
     <!-- Interactive Game Stage -->
     <div class="stage-container" id="stage-area">
-      <!-- Dynamic SVG connection line canvas -->
+      <!-- Dynamic SVG/Canvas connection line -->
       <canvas id="connection-canvas"></canvas>
 
       <!-- Left Column Cards -->
@@ -92,53 +158,103 @@
       <!-- Right Column Cards -->
       <div class="column-cards" id="right-cards-col"></div>
 
-      <!-- Floating Reward Banner -->
-      <div id="feedback-toast">Great! 🌟</div>
+    </div>
+    <!-- The existing gameplay mascot moves here while guiding the first pair. -->
+    <div id="tutorial-layer">
+      <div class="tutorial-bubble">Match these two!</div>
+    </div>
+  </div>
 
-      <!-- Interactive Tutorial Finger -->
-      <div id="tutorial-layer">
-        <div id="tutorial-hand">
-          <svg viewBox="0 0 64 64" fill="none">
-            <path d="M28 10 C28 6 34 6 34 10 L34 28 L36 28 C38 28 42 28 42 32 L42 36 C42 38 46 38 46 42 L46 46 C46 54 38 58 28 58 C18 58 14 52 14 44 L14 36 C14 32 18 30 22 34 L28 40 Z" fill="#FFE169" stroke="#E5A700" stroke-width="3" stroke-linejoin="round" />
-            <circle cx="31" cy="8" r="7" stroke="#FF6B00" stroke-width="2.5" fill="none" stroke-dasharray="3 3"/>
+  <!-- ========================================================================
+       3. LEVEL SELECT SCREEN
+       ======================================================================== -->
+  <div id="screen-levels" class="scenic-overlay hidden">
+    <div class="levels-panel">
+      <div class="levels-header">
+        <button id="btn-close-levels" type="button" aria-label="Back to home">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
           </svg>
-        </div>
-        <div class="tutorial-bubble">Match them! 👇</div>
+        </button>
+        <h2>Select Level</h2>
+        <span class="levels-header-spacer" aria-hidden="true"></span>
+      </div>
+      <div class="levels-divider"></div>
+      <div id="levels-grid" class="no-scrollbar">
+        <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
 
-  <!-- PAUSE MODAL -->
+  <!-- ========================================================================
+       4. PAUSE MODAL (Take a Break! ☕ - from Attachment 4)
+       ======================================================================== -->
   <div id="pause-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-title">Take a Break! ☕</div>
-      <div class="modal-subtitle">The game is safely paused</div>
-      <div class="modal-btn-list">
-        <button id="btn-resume" class="modal-btn btn-green">▶ Resume</button>
-        <button id="btn-restart" class="modal-btn btn-yellow">↺ Restart</button>
-        <button id="btn-home" class="modal-btn btn-blue">🏠 Home</button>
+    <div class="pause-card-container">
+      <!-- Peeking Sparky atop the card rim (exact reference image replication) -->
+      <div class="pause-sparky-peeking-wrap">
+        <div class="sparky sparky--peeking" id="pause-sparky-face"></div>
+        <span class="peeking-sparkle peeking-sparkle-1">✦</span>
+        <span class="peeking-sparkle peeking-sparkle-2">✦</span>
+      </div>
+
+      <div class="modal-card pause-modal-card">
+        <div class="modal-title-row">
+          <span class="star-accent">⭐</span>
+          <span class="modal-title-text">Take a Break!</span>
+          <span class="star-accent">⭐</span>
+        </div>
+
+        <div class="modal-btn-list">
+          <button id="btn-resume" class="modal-pill-btn btn-green-pill">
+            <span class="pill-btn-icon">▶</span>
+            <span>Continue</span>
+          </button>
+          <button id="btn-restart" class="modal-pill-btn btn-yellow-pill">
+            <span class="pill-btn-icon">↺</span>
+            <span>Restart</span>
+          </button>
+          <button id="btn-home" class="modal-pill-btn btn-blue-pill">
+            <span class="pill-btn-icon">🏠</span>
+            <span>Home</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- LEVEL COMPLETE MODAL -->
+  <!-- ========================================================================
+       5. LEVEL COMPLETE MODAL
+       ======================================================================== -->
   <div id="complete-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div style="width: 100px; height: 100px; margin: 0 auto 10px;" id="complete-sparky-box"></div>
-      <div class="modal-title">Great Job! 🎉</div>
-      <div class="modal-subtitle" id="complete-sub-text">Level 1 Complete</div>
+    <div class="modal-card complete-modal-card">
+      <div class="complete-sparky-wrap">
+        <div class="sparky sparky--celebrate" id="complete-sparky-face"></div>
+        <span class="complete-sparkle complete-sparkle--left" aria-hidden="true">✦</span>
+        <span class="complete-sparkle complete-sparkle--right" aria-hidden="true">✦</span>
+      </div>
+
+      <div class="modal-title-text complete-title">Great Job!</div>
+      <div class="modal-subtitle" id="complete-sub-text">Level 1 Complete ⭐</div>
+
       <div class="modal-btn-list">
-        <button id="btn-next-level" class="modal-btn btn-green" style="font-size: 24px; height: 64px;">NEXT ▶</button>
-        <button id="btn-replay-level" class="modal-btn btn-yellow" style="height: 48px; font-size: 16px;">↺ Replay</button>
+        <button id="btn-next-level" class="modal-pill-btn btn-green-pill btn-next-big">
+          <span>NEXT ▶</span>
+        </button>
+        <button id="btn-replay-level" class="modal-pill-btn btn-yellow-pill">
+          <span class="pill-btn-icon">↺</span>
+          <span>Replay</span>
+        </button>
+        <button id="btn-complete-home" class="modal-pill-btn btn-blue-pill">
+          <span class="pill-btn-icon">🏠</span>
+          <span>Levels</span>
+        </button>
       </div>
     </div>
   </div>
-
-  <!-- Confetti Canvas -->
-  <canvas id="confetti-canvas"></canvas>
 
 </div>
 
-<script src="script.js"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>
