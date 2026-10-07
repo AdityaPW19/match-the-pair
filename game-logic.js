@@ -516,7 +516,6 @@ export class ProgressManager {
     this.storageKey = storageKey;
     this.unlockedLevel = 1;
     this.currentLevel = 1;
-    this.xp = 0;
     this.stars = 0;
     this.soundMuted = false;
     this.load();
@@ -528,14 +527,12 @@ export class ProgressManager {
       if (data) {
         this.unlockedLevel = Math.max(1, Math.min(data.unlockedLevel || 1, LEVELS_CONFIG.length));
         this.currentLevel = Math.max(1, Math.min(data.currentLevel || 1, this.unlockedLevel));
-        this.xp = data.xp || 0;
         this.stars = data.stars || 0;
         this.soundMuted = !!data.soundMuted;
       }
     } catch (e) {
       this.unlockedLevel = 1;
       this.currentLevel = 1;
-      this.xp = 0;
       this.stars = 0;
     }
   }
@@ -545,7 +542,6 @@ export class ProgressManager {
       localStorage.setItem(this.storageKey, JSON.stringify({
         unlockedLevel: this.unlockedLevel,
         currentLevel: this.currentLevel,
-        xp: this.xp,
         stars: this.stars,
         soundMuted: this.soundMuted
       }));
@@ -557,12 +553,6 @@ export class ProgressManager {
       this.unlockedLevel = levelNum;
       this.save();
     }
-  }
-
-  addXP(amount) {
-    this.xp += amount;
-    this.save();
-    return this.xp;
   }
 
   addStar() {

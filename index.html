@@ -35,7 +35,8 @@
     <div class="menu-top-ribbon">
       <div class="ribbon-pill ribbon-flag">
         <svg class="ribbon-icon ribbon-icon--flag" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M5 21V4c3-1.5 6 1.5 9 0s5-1 6-1v10c-1.5.5-3.5 1-6 1s-6-1.5-9 0v7H5z"/>
+          <path d="M5 4c3-1.5 6 1.5 9 0s5-1 6-1v10c-1.5.5-3.5 1-6 1s-6-1.5-9 0V4z"/>
+          <path d="M5 3v18" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
         </svg>
         <span id="menu-level-indicator">1/30</span>
       </div>
@@ -119,8 +120,8 @@
       </div>
 
       <div class="hud-right-group">
-        <div class="xp-pill" id="hud-xp-box">
-          <span>⭐</span><span id="hud-xp-val">0</span>
+        <div class="stars-pill" id="hud-stars-box" aria-label="Stars">
+          <span aria-hidden="true">⭐</span><span id="hud-stars-val">0</span>
         </div>
         <button id="btn-sound" class="hud-tactile-btn" aria-label="Sound Toggle">
           <span id="game-sound-icon">🔊</span>

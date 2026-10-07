@@ -48,7 +48,7 @@ export const GAME_CONFIG = {
       { audio: 'assets/sparkyDialogues/positive/lets-do-this.mp3', text: "Let's do this! 💪" },
       { audio: 'assets/sparkyDialogues/positive/nice-attempt.mp3', text: 'Nice! Super! ⭐' },
       { audio: 'assets/sparkyDialogues/positive/yes.mp3', text: 'Yes! 🔥' },
-      { audio: 'assets/sparkyDialogues/positive/yes-sir.mp3', text: 'Yes sir! 🎩' }
+      { audio: 'assets/sparkyDialogues/positive/yes-sir.mp3', text: 'Yes sir! 🎩 Lets Go! 🚀' }
     ],
 
     wrong: [
@@ -57,7 +57,7 @@ export const GAME_CONFIG = {
       { audio: 'assets/sparkyDialogues/wrong/close-one.mp3', text: 'Close one! 🔍' },
       { audio: 'assets/sparkyDialogues/wrong/hmm-try-again.mp3', text: 'Hmm, try again! 🤔' },
       { audio: 'assets/sparkyDialogues/wrong/not-quite.mp3', text: 'Not quite! 💡' },
-      { audio: 'assets/sparkyDialogues/wrong/think-think.mp3', text: 'Think, think! 🧠' },
+      { audio: 'assets/sparkyDialogues/wrong/think-think.mp3', text: 'Think, think!, think! 🧠' },
       { audio: 'assets/sparkyDialogues/wrong/oh-tricky-one.mp3', text: 'Oh, tricky one! 👀' }
     ],
 

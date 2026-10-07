@@ -93,16 +93,16 @@ class MatchPairApp {
   updateRibbonStats() {
     const levelInd = document.getElementById('menu-level-indicator');
     const starInd = document.getElementById('menu-star-indicator');
-    const xpVal = document.getElementById('hud-xp-val');
+    const starsVal = document.getElementById('hud-stars-val');
 
     if (levelInd) {
       levelInd.textContent = `${this.progress.unlockedLevel}/${this.levels.length}`;
     }
     if (starInd) {
-      starInd.textContent = this.progress.xp || this.progress.stars || 0;
+      starInd.textContent = this.progress.stars || 0;
     }
-    if (xpVal) {
-      xpVal.textContent = this.progress.xp || 0;
+    if (starsVal) {
+      starsVal.textContent = this.progress.stars || 0;
     }
   }
 
@@ -699,7 +699,6 @@ class MatchPairApp {
   }
 
   awardMatchReward() {
-    this.progress.addXP(10);
     this.progress.addStar();
     this.updateRibbonStats();
   }
